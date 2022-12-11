@@ -1,17 +1,21 @@
-import logo from './logo.svg';
-import Button from 'react-bootstrap/Button'
 import './App.css';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import NavBar from './components/NavBar/NavBar';
 import ItemListContainer from './components/ItemListContainer/ItemListContainer';
+import ItemDetailContainer from './components/ItemDetailContainer/ItemDetailContainer';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
+    <Router>
+      <div className="App">
         <NavBar/>
-      </header>
-      <ItemListContainer saludo="Hola usuario"/>
-    </div>
+        <Routes>
+          <Route exact path="/" element={<ItemListContainer/>}></Route>
+          <Route exact path="/category/:Id" element={<ItemListContainer/>}></Route>
+          <Route exact path="/item/:Id" element={<ItemDetailContainer/>}></Route>
+        </Routes>
+      </div>
+    </Router>
   );
 }
 
