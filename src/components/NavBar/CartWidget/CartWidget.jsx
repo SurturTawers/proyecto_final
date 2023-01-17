@@ -1,7 +1,9 @@
+import {Link} from "react-router-dom"
 function CartWidget(){
-
     return (
-        <img style={{width:30}} src="/carrito.png" alt="" />
+        <Link to="checkout">
+            <img style={{width:30}} src="/carrito.png" alt="" />
+        </Link>
     );
 }
 

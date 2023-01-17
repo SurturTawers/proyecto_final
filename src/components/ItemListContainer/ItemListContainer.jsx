@@ -1,25 +1,51 @@
-import Item from "./Item/Item.jsx" 
-import { getAllItems, getCategoryItems} from "../../services/items.js";
-import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import {Container, Row} from 'react-bootstrap'
+import { db } from '../../firebase/config';
+import { getDocs, collection, query, where } from 'firebase/firestore';
+import Item from "./Item/Item.jsx" 
 
-function ItemListContainer(props){
+function ItemListContainer(){
     let {Id} = useParams();
     const [itemsData, setItemsData] = useState([]);
 
     useEffect(()=>{
+        //console.log(Id);
         if(Id){
-            setItemsData(getCategoryItems(Id));
+            const q = query(collection(db,'/items'), where("category", "==", Id));
+            let itemsList = [];
+            getDocs(q)
+                .then(snapshot=>{
+                    snapshot.forEach((doc)=>{
+                        itemsList.push({...doc.data(), id: doc.id});
+                    });
+                    setItemsData(itemsList);
+                });
         }else{
-            setItemsData(getAllItems(Id));
+            let itemsList = [];
+            getDocs(collection(db,'/items'))
+                .then(snapshot=>{
+                    snapshot.forEach((doc)=>{
+                        itemsList.push({...doc.data(), id: doc.id});
+                    });
+                    setItemsData(itemsList);
+                });
         }
-    });
+    }, [Id]);
+
     return (
-        itemsData.map((item) =>{
-            return (
-                <Item key={item.id} itemId={item.id} itemCat={item.category} itemDesc={item.description} itemPrecio={item.price}></Item>
-            );
-        })
+        <Container>
+            {
+                itemsData.length !==0 ? (itemsData.map((item) =>{
+                    return (
+                        <Row className="justify-content-center">
+                            <Item key={item.id} itemId={item.id} itemCat={item.category} itemDesc={item.description} itemPrecio={item.price}></Item>
+                        </Row>
+                    )
+                })) : <p>Cargando artículos...</p> 
+            }
+        </Container>
+        
     );
 }
 

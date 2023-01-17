@@ -1,32 +1,33 @@
-import Card from "react-bootstrap/Card"
+import { useState,useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { ITEMS } from "../../utils/items";
-import { getItem} from "../../services/items.js";
-import { useState } from "react";
-import { useEffect } from "react";
+import {Container, Row} from "react-bootstrap";
+import Item from "../ItemListContainer/Item/Item.jsx";
+import { db } from '../../firebase/config';
+import { doc, getDoc } from 'firebase/firestore';
+
 function ItemDetailContainer(){
     let {Id} = useParams();
-    const [itemData, setItemData] = useState({});
+    const [itemData, setItemData] = useState(null);
 
     useEffect(()=>{
-        setItemData(getItem(Id));
+        const docRef = doc(db,'/items', Id);
+        getDoc(docRef)
+            .then(snapshot =>{
+                setItemData({...snapshot.data(), id:snapshot.id});
+            })
     });
 
     return (
-        <div className="col-8 mb-5">    
-            <Card>
-                <Card.Header>
-                    {itemData.id}
-                </Card.Header>
-                <Card.Body>
-                    <p>{itemData.description}</p>
-                    <p>{itemData.category}</p>
-                </Card.Body>
-                <Card.Footer>
-                    {itemData.price}
-                </Card.Footer>
-            </Card>
-        </div>
+        
+        <Container>
+            {
+                itemData !== null ? (
+                    <Row className="justify-content-center" >
+                        <Item key={itemData.id} itemId={itemData.id} itemCat={itemData.category} itemDesc={itemData.description} itemPrecio={itemData.price}></Item>
+                    </Row>
+                ) : <span>Cargando artículo...</span>
+            }
+        </Container>
     );
 }
 
